@@ -14,7 +14,7 @@ public class Employee {
 		this.name="";
 		this.salary=0.0;
 		this.password="";
-	}
+	    }
     
     public Employee(int id,String name,double salary,String dept,String pinfo,String pass) {
  		this.empId=id;
