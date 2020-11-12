@@ -20,12 +20,12 @@ jobs:
       runs-on: ubuntu-latest
       container:
         image: ubuntu:latest
-      options: --dns 127.0.0.1
+        options: --dns 127.0.0.1
       services:
-      squid-proxy:
-        image: datadog/squid:latest
-        ports:
-          - 3128:3128
+        squid-proxy:
+          image: datadog/squid:latest
+          ports:
+            - 3128:3128
       env:
         https_proxy: http://squid-proxy:3128 
     # Steps represent a sequence of tasks that will be executed as part of the job
