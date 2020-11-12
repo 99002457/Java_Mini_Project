@@ -1,45 +1,88 @@
-# This is a basic workflow to help you get started with Actions
-
-name: Build
-
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the main branch
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+name: Main workflow
+on: [push, pull_request]
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-  test-proxy:
-      runs-on: ubuntu-latest
-      container:
-        image: ubuntu:latest
-        options: --dns 127.0.0.1
-      services:
-        squid-proxy:
-          image: datadog/squid:latest
-          ports:
-            - 3128:3128
-      env:
-        https_proxy: http://squid-proxy:3128 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest, windows-latest]
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-      - name: Verify Java 13
-        run: __tests__/verify-java.sh 13.0.2 "${{ steps.setup-java.outputs.path }}" "${{ steps.setup-java.outputs.version }}"
-      # Runs a single command using the runners shell
-      - name: Setup Java 13
-        id: setup-java
-        uses: ./
-        with:
-          java-version: 13.0.2
-      # Runs a set of commands using the runners shell
-      - name: Verify Java 13
-        run: __tests__/verify-java.sh 13.0.2 "${{ steps.setup-java.outputs.path }}" "${{ steps.setup-java.outputs.version }}"
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Node.js 12
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - name: npm install
+      run: npm install
+    - name: Lint
+      run: npm run format-check
+    - name: npm test
+      run: npm test
+
+  test:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest, windows-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Clear tool cache
+      if: runner.os != 'windows'
+      run: mv "${{ runner.tool_cache }}" "${{ runner.tool_cache }}.old"
+    - name: Clear tool cache (Windows)
+      if: runner.os == 'windows'
+      run: move "${{ runner.tool_cache }}" "${{ runner.tool_cache }}.old"
+    - name: Setup Java 13
+      id: setup-java
+      uses: ./
+      with:
+        java-version: 13.0.2
+    - name: Verify Java 13
+      if: runner.os != 'windows'
+      run: __tests__/verify-java.sh 13.0.2 "${{ steps.setup-java.outputs.path }}" "${{ steps.setup-java.outputs.version }}"
+    - name: Verify Java 13 (Windows)
+      if: runner.os == 'windows'
+      run: __tests__/verify-java.ps1 13.0.2 "${{ steps.setup-java.outputs.path }}" "${{ steps.setup-java.outputs.version }}"
+
+  test-proxy:
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:latest
+      options: --dns 127.0.0.1
+    services:
+      squid-proxy:
+        image: datadog/squid:latest
+        ports:
+          - 3128:3128
+    env:
+      https_proxy: http://squid-proxy:3128
+    steps:
+    - uses: actions/checkout@v2
+    - name: Clear tool cache
+      run: rm -rf $RUNNER_TOOL_CACHE/*
+    - name: Setup Java 13
+      id: setup-java
+      uses: ./
+      with:
+        java-version: 13.0.2
+    - name: Verify Java 13
+      run: __tests__/verify-java.sh 13.0.2 "${{ steps.setup-java.outputs.path }}" "${{ steps.setup-java.outputs.version }}"
+
+  test-bypass-proxy:
+    runs-on: ubuntu-latest
+    env:
+      https_proxy: http://no-such-proxy:3128
+      no_proxy: github.com,static.azul.com
+    steps:
+    - uses: actions/checkout@v2
+    - name: Clear tool cache
+      run: rm -rf $RUNNER_TOOL_CACHE/*
+    - name: Setup Java 13
+      id: setup-java
+      uses: ./
+      with:
+        java-version: 13.0.2
+    - name: Verify Java 13
+      run: __tests__/verify-java.sh 13.0.2 "${{ steps.setup-java.outputs.path }}" "${{ steps.setup-java.outputs.version }}"
