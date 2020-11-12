@@ -1,2 +1,2 @@
 # Java_Mini_Project
-Contributor: Pavan , Chetan , Shrikant
+Contributor: Pavan , Chethan G C , Shrikant
