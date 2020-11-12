@@ -32,4 +32,6 @@ jobs:
       - name: Verify version
         run: java -version
       - name: Compile
-        run: javac 
+        run: |
+          cd 3_Implementation/src/src/Employeee/
+          javac FrontPage.java
