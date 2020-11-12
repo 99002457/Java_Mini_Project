@@ -30,6 +30,6 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Verify version
-        run: java --version
+        run: java -version
       - name: Compile
         run: javac 
