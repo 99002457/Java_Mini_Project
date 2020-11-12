@@ -34,4 +34,4 @@ jobs:
       - name: Compile
         run: |
           cd 3_Implementation/src/src/Employeee/
-          javac Front_Page.java
+          javac Front_Page.java login.java details.java conn.java View_Employee.java Update_Employee.java Search_Employee.java Remove_Employee.java Print_Data.java Add_Employee.java
