@@ -1,4 +1,7 @@
 # Java_Mini_Project
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8f7afe49bcfb495b94db0eafc3c534c4)](https://app.codacy.com/gh/99002457/Java_Mini_Project?utm_source=github.com&utm_medium=referral&utm_content=99002457/Java_Mini_Project&utm_campaign=Badge_Grade)
+
 Contributor: Pavan , Chethan G C , Shrikant
 
 ![CI](https://github.com/99002457/Java_Mini_Project/workflows/CI/badge.svg)
